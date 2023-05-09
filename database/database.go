@@ -2,8 +2,10 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
+	"github.com/celpostgress-api/utils"
 	_ "github.com/lib/pq"
 )
 
@@ -15,7 +17,7 @@ const (
 	dbname   = "celestialposgre"
 )
 
-func GetConnection() (db *sql.DB, error error) {
+func GetConnection(cfg utils.Config) (db *sql.DB, error error) {
 	// dbDriver := "postgress"
 	// dbUser := "root"
 	// dbPass := "Serverh5n&*#"
@@ -29,10 +31,19 @@ func GetConnection() (db *sql.DB, error error) {
 	// }
 	// return db, err
 	// postgresql://admin:password123@localhost:6500/golang_postgres?sslmode=disable
-	db, err := sql.Open("postgres", "postgresql://postgres:Serverh5n@localhost:5433/celestialposgre?sslmode=disable")
+	pgDSN := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable", cfg.PgDBUser, cfg.PgDBPass, cfg.PgDBHost, cfg.PgDBPort, cfg.PgDBName)
+	db, err := sql.Open("postgres", pgDSN)
 	if err != nil {
 		log.Fatalf("could not connect to postgres database: %v", err)
+		return nil, err
 	}
+
+	if err := db.Ping(); err != nil {
+		log.Fatalf("could not connect to %s %v", pgDSN, err)
+		return nil, err
+	}
+
+	log.Default().Print("database connected to", pgDSN)
 
 	// db = dbConn.New(conn)
 
