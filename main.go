@@ -9,6 +9,7 @@ import (
 	"github.com/celpostgress-api/repository"
 	"github.com/celpostgress-api/routes"
 	"github.com/celpostgress-api/services"
+	"github.com/celpostgress-api/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	swaggerFiles "github.com/swaggo/files"     // swagger embed files
@@ -30,6 +31,11 @@ func main() {
 	// 	log.Fatalf("sentry.Init: %s", err)
 	// }
 
+	config, err := utils.LoadConfig(".")
+	if err != nil {
+		panic(err)
+	}
+
 	docs.SwaggerInfo.Title = "Celestial - Celestial API"
 	docs.SwaggerInfo.Description = "Celestial - Celestial App API."
 	docs.SwaggerInfo.Version = "1.0"
@@ -37,7 +43,11 @@ func main() {
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	docs.SwaggerInfo.Schemes = []string{"http"}
 
-	db, _ := database.GetConnection()
+	db, err := database.GetConnection(config)
+	if err != nil {
+		panic(err)
+	}
+
 	validate := validator.New()
 
 	bankRepository := repository.NewBankRepository()
