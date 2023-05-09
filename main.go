@@ -39,7 +39,7 @@ func main() {
 	docs.SwaggerInfo.Title = "Celestial - Celestial API"
 	docs.SwaggerInfo.Description = "Celestial - Celestial App API."
 	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Host = "localhost:3100"
+	docs.SwaggerInfo.Host = config.AppHost
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	docs.SwaggerInfo.Schemes = []string{"http"}
 
@@ -78,6 +78,9 @@ func main() {
 	// router.StaticFile("/favicon.ico", "./resources/favicon.ico")
 	// router.StaticFileFS("/more_favicon.ico", "more_favicon.ico", http.Dir("my_file_system"))
 
+	router.GET("/ping", func(ctx *gin.Context) {
+		ctx.String(200, "pong")
+	})
 	// router := gin.New()
 	makeRoutes(router)
 	router.Use(gin.Logger())
